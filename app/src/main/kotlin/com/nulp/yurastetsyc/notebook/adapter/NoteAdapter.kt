@@ -8,6 +8,7 @@ import android.widget.TextView
 import com.nulp.yurastetsyc.notebook.R
 import com.nulp.yurastetsyc.notebook.data.Note
 import kotlinx.android.synthetic.main.item_note.view.*
+import java.util.*
 
 /**
  * Created by Yura Stetsyc on 2/14/17.
@@ -31,6 +32,10 @@ class NoteAdapter(val mNotes: List<Note>) : RecyclerView.Adapter<NoteAdapter.Not
 
         val mContentText: TextView = itemView.content_text
         val mCreatedDate: TextView = itemView.created_date
+
+        init {
+            mCreatedDate.maxLines = Math.abs(Random(System.currentTimeMillis()).nextInt()) % 6 + 1
+        }
 
         fun bind(note: Note) {
             mContentText.text = note.mContent
