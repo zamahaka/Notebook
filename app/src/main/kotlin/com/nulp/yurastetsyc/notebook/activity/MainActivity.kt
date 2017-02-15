@@ -1,7 +1,9 @@
 package com.nulp.yurastetsyc.notebook.activity
 
+import android.content.ContentValues
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.StaggeredGridLayoutManager
@@ -14,23 +16,16 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    val mNotes: MutableList<Note> = ArrayList()
-    val mDataBase: SQLiteDatabase = DataBaseHelper(this).writableDatabase
+    val mNotes: MutableList<Note> = mutableListOf()
+    var mDataBase: SQLiteDatabase? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mNotes.addAll(Arrays.asList(
-                Note(0, "Note 0", Calendar.getInstance()),
-                Note(1, "Note 1", Calendar.getInstance()),
-                Note(2, "Note 2", Calendar.getInstance()),
-                Note(3, "Note 3", Calendar.getInstance()),
-                Note(4, "Note 4", Calendar.getInstance()),
-                Note(5, "Note 5", Calendar.getInstance()),
-                Note(6, "Note 6", Calendar.getInstance()),
-                Note(7, "Note 7", Calendar.getInstance())
-        ))
+        deleteDatabase(DataBaseHelper.DATABASE_NAME)
+
+        mDataBase = DataBaseHelper(this).writableDatabase
 
         initViews()
     }
@@ -39,17 +34,67 @@ class MainActivity : AppCompatActivity() {
         val recyclerView = this.recyclerView
         recyclerView.adapter = NoteAdapter(mNotes)
 
-        val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        recyclerView.layoutManager = layoutManager
+        recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
-        this.fab.setOnClickListener { startActivity(Intent(this, EditNoteActivity::class.java)) }
+        this.fab.setOnClickListener {
+            startActivityForResult(Intent(this, EditNoteActivity::class.java)
+                    .putExtra(EditNoteActivity.NOTE_KEY, mDataBase?.let { it -> createNewNote(it) }),
+                    EditNoteActivity.RQC_EDIT_NOTE)
+        }
     }
 
     private fun createNewNote(database: SQLiteDatabase): Note {
-        val cursor = database.rawQuery("SELECT ${DataBaseHelper.ID} from ${DataBaseHelper.TABLE_NOTES}" +
-                " order by ${DataBaseHelper.ID} DESC limit 1", null)
-        val id = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.ID))
-        cursor.close()
-        return Note(id, "", Calendar.getInstance())
+        val cv = ContentValues()
+
+        val colorWhite: String = "#FFFFFFFF"
+
+        cv.put(DataBaseHelper.NOTES_CONTENT, "")
+        cv.put(DataBaseHelper.NOTES_TIME, System.currentTimeMillis())
+        cv.put(DataBaseHelper.NOTES_PRIORITY, Note.Priority.NORMAL.mPriority)
+        cv.put(DataBaseHelper.NOTES_BACKGROUND, colorWhite)
+
+        val id = database.insert(DataBaseHelper.TABLE_NOTES, null, cv)
+
+        return Note(id, "", Calendar.getInstance(), Note.Priority.NORMAL, colorWhite)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == EditNoteActivity.RQC_EDIT_NOTE) {
+            val note: Note? = data?.extras?.get(EditNoteActivity.NOTE_KEY) as Note?
+            when (resultCode) {
+                EditNoteActivity.RSC_ADD_NOTE -> {
+                    note?.let {
+                        mNotes.add(it)
+                        recyclerView.adapter.notifyItemInserted(mNotes.size - 1)
+                    }
+                }
+
+                EditNoteActivity.RSC_UPDATE_NOTE -> {
+                    note?.let {
+                        val id = it.mId
+                        val index = mNotes.indexOfFirst { it.mId == id }
+                        if (index > -1 && index < mNotes.size) {
+                            mNotes[index] = it
+                        }
+                    }
+                }
+
+                EditNoteActivity.RSC_DELETE_NOTE -> {
+                    note?.let {
+                        val id = it.mId
+                        val index = mNotes.indexOfFirst { it.mId == id }
+                        if (index > -1 && index < mNotes.size) {
+                            mNotes.removeAt(index)
+                        }
+                        deleteNoteFromDatabase(it)
+                    }
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun deleteNoteFromDatabase(note: Note) {
+        mDataBase?.delete(DataBaseHelper.TABLE_NOTES, "${DataBaseHelper.NOTES_ID} = ${note.mId}", null)
     }
 }

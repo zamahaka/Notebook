@@ -9,26 +9,29 @@ import android.util.Log
  * Created by Yura Stetsyc on 2/15/17.
  */
 class DataBaseHelper(mContext: Context) :
-        SQLiteOpenHelper(mContext, "NOTE_DATABASE.db", null, 4) {
+        SQLiteOpenHelper(mContext, DataBaseHelper.DATABASE_NAME, null, DataBaseHelper.DATABASE_VERSION) {
 
     val TAG: String = DataBaseHelper::class.java.simpleName
 
     companion object {
-        val TABLE_NOTES = "NOTES"
-        public val ID: String = "ID"
-        public val TIME: String = "TIME"
-        public val TEXT: String = "TEXT"
-        public val PRIORITY: String = "PRIORITY"
-        public val BACKGROUND: String = "BACKGROUND"
+        val DATABASE_NAME = "NOTE_DATABASE.db"
+        val DATABASE_VERSION = 1
+
+        val TABLE_NOTES: String = "NOTES"
+        val NOTES_ID: String = "ID"
+        val NOTES_TIME: String = "TIME"
+        val NOTES_CONTENT: String = "CONTENT"
+        val NOTES_PRIORITY: String = "PRIORITY"
+        val NOTES_BACKGROUND: String = "BACKGROUND"
     }
 
     val DATABASE_CREATE_NOTES =
-            "CREATE TABLE_NOTES if not exists " + TABLE_NOTES + " (" +
-                    "$ID integer PRIMARY KEY autoincrement," +
-                    "$TIME long," +
-                    "$TEXT text" +
-                    "$PRIORITY int" +
-                    "$BACKGROUND int" +
+            "CREATE TABLE if not exists $TABLE_NOTES" + " (" +
+                    "$NOTES_ID integer PRIMARY KEY autoincrement," +
+                    "$NOTES_CONTENT text," +
+                    "$NOTES_TIME long," +
+                    "$NOTES_PRIORITY int," +
+                    "$NOTES_BACKGROUND text" +
                     ")"
 
     override fun onCreate(db: SQLiteDatabase?) {
