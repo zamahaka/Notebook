@@ -1,6 +1,5 @@
 package com.nulp.yurastetsyc.notebook.data
 
-import android.graphics.drawable.Drawable
 import android.os.Parcel
 import android.os.Parcelable
 import java.util.*
@@ -8,8 +7,8 @@ import java.util.*
 /**
  * Created by Yura Stetsyc on 2/14/17.
  */
-class Note(val mId: Long, val mContent: String, val mCreationDate: Calendar,
-           val mPriority: Priority, val mBackGround: String) : Parcelable {
+class Note(val mId: Long, var mContent: String, val mCreationDate: Calendar,
+           var mPriority: Priority, var mBackGround: String) : Parcelable {
     enum class Priority(val mPriority: Int) {
         LOW(-1), NORMAL(0), HIGH(1);
     }

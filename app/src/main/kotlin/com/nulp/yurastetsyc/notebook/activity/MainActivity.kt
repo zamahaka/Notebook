@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.StaggeredGridLayoutManager
+import android.util.Log
 import com.nulp.yurastetsyc.notebook.R
 import com.nulp.yurastetsyc.notebook.adapter.NoteAdapter
 import com.nulp.yurastetsyc.notebook.data.Note
@@ -31,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        val recyclerView = this.recyclerView
+        val recyclerView = this.mRecyclerView
         recyclerView.adapter = NoteAdapter(mNotes)
 
         recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -61,30 +62,29 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == EditNoteActivity.RQC_EDIT_NOTE) {
             val note: Note? = data?.extras?.get(EditNoteActivity.NOTE_KEY) as Note?
-            when (resultCode) {
-                EditNoteActivity.RSC_ADD_NOTE -> {
-                    note?.let {
-                        mNotes.add(it)
-                        recyclerView.adapter.notifyItemInserted(mNotes.size - 1)
-                    }
-                }
-
-                EditNoteActivity.RSC_UPDATE_NOTE -> {
-                    note?.let {
+            note?.let {
+                when (resultCode) {
+                    EditNoteActivity.RSC_UPDATE_NOTE -> {
                         val id = it.mId
                         val index = mNotes.indexOfFirst { it.mId == id }
-                        if (index > -1 && index < mNotes.size) {
-                            mNotes[index] = it
+                        when (index) {
+                            -1 -> {
+                                mNotes.add(it)
+                                mRecyclerView.adapter.notifyItemInserted(mNotes.size - 1)
+                            }
+                            else -> {
+                                mNotes[index] = it
+                                mRecyclerView.adapter.notifyItemChanged(index)
+                            }
                         }
                     }
-                }
 
-                EditNoteActivity.RSC_DELETE_NOTE -> {
-                    note?.let {
+                    EditNoteActivity.RSC_DELETE_NOTE -> {
                         val id = it.mId
                         val index = mNotes.indexOfFirst { it.mId == id }
                         if (index > -1 && index < mNotes.size) {
                             mNotes.removeAt(index)
+                            mRecyclerView.adapter.notifyItemRemoved(index)
                         }
                         deleteNoteFromDatabase(it)
                     }
