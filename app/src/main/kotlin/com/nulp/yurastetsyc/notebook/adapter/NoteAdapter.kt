@@ -8,12 +8,16 @@ import android.widget.TextView
 import com.nulp.yurastetsyc.notebook.R
 import com.nulp.yurastetsyc.notebook.data.Note
 import kotlinx.android.synthetic.main.item_note.view.*
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
  * Created by Yura Stetsyc on 2/14/17.
  */
-class NoteAdapter(val mNotes: List<Note>) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
+class NoteAdapter(val mNotes: List<Note>, val mOnNoteClickListener: (Note) -> Unit)
+    : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
+
+    val simpleDateFormat = SimpleDateFormat("dd MMMM yyyy HH:mm", Locale.getDefault())
 
     override fun getItemCount(): Int {
         return mNotes.size
@@ -28,18 +32,18 @@ class NoteAdapter(val mNotes: List<Note>) : RecyclerView.Adapter<NoteAdapter.Not
         holder?.bind(mNotes[position])
     }
 
-    class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val mContentText: TextView = itemView.content_text
         val mCreatedDate: TextView = itemView.created_date
 
         init {
-            mCreatedDate.maxLines = Math.abs(Random(System.currentTimeMillis()).nextInt()) % 6 + 1
+            itemView.setOnClickListener({ mOnNoteClickListener(mNotes[adapterPosition]) })
         }
 
         fun bind(note: Note) {
             mContentText.text = note.mContent
-            mCreatedDate.text = note.mCreationDate.toString()
+            mCreatedDate.text = simpleDateFormat.format(note.mCreationDate.time)
         }
 
     }

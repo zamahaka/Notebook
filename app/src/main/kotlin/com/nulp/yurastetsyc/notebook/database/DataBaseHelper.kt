@@ -30,7 +30,7 @@ class DataBaseHelper(mContext: Context) :
                     "$NOTES_ID integer PRIMARY KEY autoincrement," +
                     "$NOTES_CONTENT text," +
                     "$NOTES_TIME long," +
-                    "$NOTES_PRIORITY int," +
+                    "$NOTES_PRIORITY text," +
                     "$NOTES_BACKGROUND text" +
                     ")"
 
