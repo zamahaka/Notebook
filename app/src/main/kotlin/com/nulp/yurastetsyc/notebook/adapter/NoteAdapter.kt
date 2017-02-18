@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.nulp.yurastetsyc.notebook.R
 import com.nulp.yurastetsyc.notebook.data.Note
+import com.nulp.yurastetsyc.notebook.util.NoteBackgroundParser
 import kotlinx.android.synthetic.main.item_note.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -17,7 +18,7 @@ import java.util.*
 class NoteAdapter(val mNotes: List<Note>, val mOnNoteClickListener: (Note) -> Unit)
     : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
-    val simpleDateFormat = SimpleDateFormat("dd MMMM yyyy HH:mm", Locale.getDefault())
+    val simpleDateFormat = SimpleDateFormat("dd MM yyyy HH:mm", Locale.getDefault())
 
     override fun getItemCount(): Int {
         return mNotes.size
@@ -34,16 +35,21 @@ class NoteAdapter(val mNotes: List<Note>, val mOnNoteClickListener: (Note) -> Un
 
     inner class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+        val mRoot: ViewGroup = itemView.mRoot
         val mContentText: TextView = itemView.content_text
         val mCreatedDate: TextView = itemView.created_date
+        val mBackground: View = itemView.mTintOverlay
 
         init {
-            itemView.setOnClickListener({ mOnNoteClickListener(mNotes[adapterPosition]) })
+            mBackground.setOnClickListener({ mOnNoteClickListener(mNotes[adapterPosition]) })
         }
 
         fun bind(note: Note) {
             mContentText.text = note.mContent
             mCreatedDate.text = simpleDateFormat.format(note.mCreationDate.time)
+
+            mBackground.background = NoteBackgroundParser.getBackgroundDrawable(note.mBackGround,
+                    itemView.context)
         }
 
     }

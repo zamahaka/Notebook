@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
     private fun initViews() {
         val recyclerView = mRecyclerView
         recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager = /*StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)*/LinearLayoutManager(this)
+        recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.adapter = NoteAdapter(mNotes, {
             startEditNoteActivity(it)

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Notebook</string>
     <string name="error_edit_note_null">Edit note is null</string>
+    <string name="item_note_image">item_note_image</string>
 </resources>
