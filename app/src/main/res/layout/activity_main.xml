@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
-    android:padding="@dimen/item_note_margin"
     android:layout_height="match_parent"
     tools:context="com.nulp.yurastetsyc.notebook.activity.MainActivity">
 
@@ -16,6 +15,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:padding="@dimen/item_note_margin"
         tools:listitem="@layout/item_note"/>
 
     <android.support.design.widget.FloatingActionButton
